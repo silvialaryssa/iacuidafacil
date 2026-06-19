@@ -136,15 +136,6 @@ class AnalyticsService:
         except Exception:
             pass
 
-    def track_page_view(self, page_name: str, email: str = "", params: dict[str, Any] | None = None) -> None:
-        page_params = {
-            "page_title": page_name,
-            "page_location": f"app://cuidafacil/{page_name.lower().replace(' ', '-')}",
-            "page_name": page_name,
-            **(params or {}),
-        }
-        self.track("page_view", email, page_params)
-
     def track_section_access(
         self,
         section_name: str,
@@ -158,10 +149,9 @@ class AnalyticsService:
             **(params or {}),
         }
         self.track("section_access", email, event_params)
-        self.track_page_view(section_name, email, event_params)
 
     def track_hoje_access(self, email: str = "", params: dict[str, Any] | None = None) -> None:
-        self.track_section_access("Hoje", email, params)
+        self.track_section_access("Sua Rotina", email, params)
 
     def track_calendario_access(self, email: str = "", params: dict[str, Any] | None = None) -> None:
         self.track_section_access("Calendario", email, params)
@@ -171,6 +161,9 @@ class AnalyticsService:
 
     def track_planta_ia_access(self, email: str = "", params: dict[str, Any] | None = None) -> None:
         self.track_section_access("Planta com IA", email, params)
+
+    def track_admin_access(self, email: str = "", params: dict[str, Any] | None = None) -> None:
+        self.track_section_access("Admin", email, params)
 
     def track_retention(self, user: dict, trigger: str = "session") -> None:
         retention = self.retention_params(user)

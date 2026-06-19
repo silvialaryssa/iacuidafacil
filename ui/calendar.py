@@ -120,9 +120,9 @@ def render_calendar(user: dict) -> None:
         completed_ids = set(executions["id_atividade"].astype(str))
 
     if activities.empty:
-        st.info("Nenhuma atividade encontrada para este dia. Se quiser, volte para Hoje e crie uma rotina nova.")
-        if st.button("Ir para Hoje", use_container_width=True):
-            st.session_state["page"] = "🏠 Hoje"
+        st.info("Nenhuma atividade encontrada para este dia. Se quiser, volte para Sua Rotina e crie uma rotina nova.")
+        if st.button("Ir para Sua Rotina", use_container_width=True):
+            st.session_state["page"] = "🏠 Sua Rotina"
             st.rerun()
         return
 

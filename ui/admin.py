@@ -14,6 +14,7 @@ from services.metrics_service import (
     sessions_by_day,
 )
 from ui.components import figure_card, metric_card
+from ui.setup import render_setup
 
 
 def render_admin(user: dict) -> None:
@@ -93,6 +94,9 @@ def render_admin(user: dict) -> None:
             "A escolha é salva na aba configuracoes do Google Sheets. "
             "As chaves continuam protegidas nos Secrets do Streamlit."
         )
+
+    with st.expander("⚙️ Configuração inicial", expanded=False):
+        render_setup()
 
     st.divider()
 

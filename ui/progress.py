@@ -140,9 +140,9 @@ def render_progress(user: dict) -> None:
         _render_activity_metrics(concluidas_mes, previstas_mes)
         
         st.divider()
-        st.subheader("Compartilhar")
-        message_mes = _generate_share_message(progresso_mes, concluidas_mes, previstas_mes, "mês", nome_usuario)
-        _create_share_buttons(message_mes, "mes")
+        #st.subheader("Compartilhar")
+       # message_mes = _generate_share_message(progresso_mes, concluidas_mes, previstas_mes, "mês", nome_usuario)
+        #_create_share_buttons(message_mes, "mes")
     
     # ==================== ABA: SEMANA ====================
     with tab_semana:
@@ -155,9 +155,9 @@ def render_progress(user: dict) -> None:
         _render_activity_metrics(concluidas_semana, previstas_semana)
         
         st.divider()
-        st.subheader("Compartilhar")
-        message_semana = _generate_share_message(progresso_semana, concluidas_semana, previstas_semana, "semana", nome_usuario)
-        _create_share_buttons(message_semana, "semana")
+        #st.subheader("Compartilhar")
+        #message_semana = _generate_share_message(progresso_semana, concluidas_semana, previstas_semana, "semana", nome_usuario)
+        #_create_share_buttons(message_semana, "semana")
     
     # ==================== ABA: COMPARATIVO ====================
     with tab_comparativo:

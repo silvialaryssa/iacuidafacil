@@ -889,27 +889,65 @@ div.stButton > button:hover {
   margin-top: 12px;
 }
 
-.plant-care-card {
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(47, 111, 66, 0.12);
-  border-radius: 16px;
-  padding: 14px 16px;
-  margin-bottom: 10px;
-  box-shadow: 0 8px 20px rgba(33, 79, 49, 0.06);
+.plant-care-list-card {
+  background:
+    radial-gradient(circle at 92% 12%, rgba(242, 178, 76, 0.14) 0%, transparent 26%),
+    linear-gradient(145deg, #ffffff 0%, #f5fbf2 100%);
+  border: 1px solid rgba(47, 111, 66, 0.14);
+  border-radius: 20px;
+  padding: 18px;
+  margin: 10px 0 12px;
+  box-shadow: 0 12px 28px rgba(33, 79, 49, 0.08);
+}
+
+.plant-care-rows {
+  margin-top: 12px;
+}
+
+.plant-care-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 4px;
+  border-bottom: 1px solid rgba(47, 111, 66, 0.1);
+}
+
+.plant-care-row:last-child {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.plant-care-badge {
+  flex-shrink: 0;
+  background: rgba(47, 111, 66, 0.1);
+  color: #2a573c;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.plant-care-content {
+  min-width: 0;
 }
 
 .plant-care-when {
-  color: #2a573c;
-  font-size: 0.82rem;
-  font-weight: 800;
+  color: #5f7568;
+  font-size: 0.76rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
 }
 
 .plant-care-what {
-  color: #466353;
-  font-size: 0.92rem;
+  color: #2c4234;
+  font-size: 0.94rem;
+  line-height: 1.45;
 }
 
 .plant-alert-card {
@@ -1261,7 +1299,7 @@ div.stButton > button:hover {
   .home-empty-state,
   .plant-info-card,
   .plant-result-card,
-  .plant-care-card,
+  .plant-care-list-card,
   .plant-alert-card {
     border-radius: 14px;
   }

@@ -89,26 +89,27 @@ def _render_ai_result(user: dict, data: dict) -> None:
 
     cuidados = data.get("cuidados_semanais", []) or []
     if cuidados:
-        st.markdown(
-            """
-            <div class="home-section-eyebrow">Cuidados sugeridos</div>
-            <div class="home-section-title">Tarefas que serão criadas</div>
-            """,
-            unsafe_allow_html=True,
-        )
+        rows = []
         for cuidado in cuidados:
             dia = escape(str(cuidado.get("dia_semana", "")).strip())
             horario = escape(str(cuidado.get("horario", "")).strip())
             descricao = escape(str(cuidado.get("descricao", "")).strip())
-            st.markdown(
-                f"""
-                <div class="plant-care-card">
-                    <div class="plant-care-when">{dia} {horario}</div>
-                    <div class="plant-care-what">{descricao}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
+            rows.append(
+                f'<div class="plant-care-row">'
+                f'<span class="plant-care-badge">{dia}</span>'
+                f'<div class="plant-care-content">'
+                f'<div class="plant-care-when">{horario}</div>'
+                f'<div class="plant-care-what">{descricao}</div>'
+                f"</div></div>"
             )
+        st.markdown(
+            '<div class="plant-care-list-card">'
+            '<div class="home-section-eyebrow">Cuidados sugeridos</div>'
+            '<div class="home-section-title">Tarefas que serão criadas</div>'
+            f'<div class="plant-care-rows">{"".join(rows)}</div>'
+            "</div>",
+            unsafe_allow_html=True,
+        )
 
     alertas = [a for a in data.get("alertas", []) if str(a).strip()]
     if alertas:
@@ -138,7 +139,7 @@ def _render_ai_result(user: dict, data: dict) -> None:
                 )
                 st.session_state.pop("plant_ai_result", None)
                 st.session_state["save_message"] = "Planta cadastrada e cuidados criados."
-                st.session_state["page"] = "🏠 Hoje"
+                st.session_state["page"] = "🏠 Sua Rotina"
                 st.rerun()
             except Exception as err:
                 st.error(f"Não foi possível cadastrar a planta: {err}")
@@ -147,8 +148,8 @@ def _render_ai_result(user: dict, data: dict) -> None:
             st.session_state.pop("plant_ai_result", None)
             st.rerun()
 
-    with st.expander("Ver JSON estruturado"):
-        st.code(json.dumps({k: v for k, v in data.items() if k != "_prompt_usuario"}, ensure_ascii=False, indent=2), language="json")
+   # with st.expander("Ver JSON estruturado"):
+      #s  st.code(json.dumps({k: v for k, v in data.items() if k != "_prompt_usuario"}, ensure_ascii=False, indent=2), language="json")
 
 
 def render_plant_ai(user: dict) -> None:
