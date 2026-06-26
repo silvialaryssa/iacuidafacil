@@ -3,7 +3,12 @@ from __future__ import annotations
 import streamlit as st
 
 from services.app_service import ensure_user_profile, is_valid_email
-from services.auth_service import sign_in_with_email_password, sign_up_with_email_password
+from services.auth_service import (
+    confirm_password_reset_with_otp,
+    request_password_reset,
+    sign_in_with_email_password,
+    sign_up_with_email_password,
+)
 
 
 def _complete_login(user: dict, message: str) -> None:
@@ -28,6 +33,10 @@ def render_login_form() -> None:
             max_chars=128,
         )
         entrar = st.form_submit_button("Entrar", type="primary", use_container_width=True)
+
+    if st.button("Esqueci minha senha"):
+        st.session_state["show_forgot_password"] = True
+        st.rerun()
 
     if not entrar:
         return
@@ -150,7 +159,126 @@ def render_cadastro_form() -> None:
     st.rerun()
 
 
+def render_forgot_password_form() -> None:
+    st.subheader("Recuperar senha")
+
+    if st.session_state.get("password_reset_email"):
+        _render_confirm_reset_form()
+        return
+
+    st.caption("Informe seu e-mail cadastrado para receber um código de recuperação.")
+
+    with st.form("forgot_password_form"):
+        email_recuperacao = st.text_input(
+            "E-mail cadastrado",
+            placeholder="seuemail@exemplo.com",
+            max_chars=120,
+        )
+        enviar = st.form_submit_button(
+            "Enviar código de recuperação", type="primary", use_container_width=True
+        )
+
+    if st.button("Voltar para o login"):
+        st.session_state.pop("show_forgot_password", None)
+        st.rerun()
+
+    if not enviar:
+        return
+
+    email_limpo = email_recuperacao.strip().lower()
+
+    if not is_valid_email(email_limpo):
+        st.warning("Informe um e-mail válido.")
+        return
+
+    with st.spinner("Enviando código de recuperação..."):
+        resultado = request_password_reset(email_limpo)
+
+    if resultado.get("ok"):
+        st.session_state["password_reset_email"] = email_limpo
+        st.rerun()
+    else:
+        st.error(str(resultado.get("message", "Falha ao enviar e-mail de recuperação.")))
+
+
+def _render_confirm_reset_form() -> None:
+    email_recuperacao = st.session_state.get("password_reset_email", "")
+    st.success(f"Enviamos um código de recuperação para {email_recuperacao}.")
+    st.caption("Informe o código recebido por e-mail e defina sua nova senha.")
+
+    with st.form("confirm_reset_form"):
+        codigo = st.text_input(
+            "Código recebido por e-mail",
+            placeholder="Ex: 123456",
+            max_chars=10,
+        )
+        nova_senha = st.text_input(
+            "Nova senha",
+            type="password",
+            max_chars=128,
+            help="Use no mínimo 6 caracteres.",
+        )
+        confirmar_nova_senha = st.text_input(
+            "Confirmar nova senha",
+            type="password",
+            max_chars=128,
+        )
+        salvar = st.form_submit_button(
+            "Salvar nova senha", type="primary", use_container_width=True
+        )
+
+    col_reenviar, col_voltar = st.columns(2)
+    with col_reenviar:
+        if st.button("Reenviar código", use_container_width=True):
+            with st.spinner("Reenviando código..."):
+                request_password_reset(email_recuperacao)
+            st.success("Código reenviado.")
+    with col_voltar:
+        if st.button("Voltar para o login", use_container_width=True):
+            st.session_state.pop("show_forgot_password", None)
+            st.session_state.pop("password_reset_email", None)
+            st.rerun()
+
+    if not salvar:
+        return
+
+    codigo_limpo = codigo.strip()
+    nova_senha_limpa = nova_senha.strip()
+    confirmar_limpa = confirmar_nova_senha.strip()
+
+    if not codigo_limpo:
+        st.warning("Informe o código recebido por e-mail.")
+        return
+    if len(nova_senha_limpa) < 6:
+        st.warning("A senha deve ter pelo menos 6 caracteres.")
+        return
+    if nova_senha_limpa != confirmar_limpa:
+        st.warning("A confirmação de senha não confere.")
+        return
+
+    with st.spinner("Atualizando senha..."):
+        resultado = confirm_password_reset_with_otp(
+            email=email_recuperacao,
+            otp=codigo_limpo,
+            new_password=nova_senha_limpa,
+        )
+
+    if not resultado.get("ok"):
+        st.error(str(resultado.get("message", "Falha ao atualizar senha.")))
+        return
+
+    st.session_state.pop("show_forgot_password", None)
+    st.session_state.pop("password_reset_email", None)
+    st.session_state["auth_tab"] = "Já tenho cadastro"
+    st.session_state["login_message"] = "Senha atualizada com sucesso! Faça login com sua nova senha."
+    st.rerun()
+
+
 def render_auth_section() -> None:
+    if st.session_state.get("show_forgot_password"):
+        render_forgot_password_form()
+        return
+
     opcoes = ["Já tenho cadastro", "Quero me cadastrar"]
     padrao = st.session_state.get("auth_tab", opcoes[0])
 

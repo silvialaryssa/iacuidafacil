@@ -57,6 +57,8 @@ def _friendly_auth_error(exc: Exception) -> str:
         return "Cadastro por e-mail está desativado no Supabase Auth."
     if "email rate limit exceeded" in text_lower:
         return "Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente."
+    if "expired" in text_lower or "invalid" in text_lower and "token" in text_lower:
+        return "Código de recuperação inválido ou expirado. Solicite um novo código."
 
     return f"Falha na autenticação Supabase: {text or 'erro desconhecido.'}"
 
@@ -391,5 +393,58 @@ def sign_up_with_email_password(first_name: str, email: str, password: str) -> d
     except Exception as exc:
         return {
             "status": "error",
+            "message": _friendly_auth_error(exc),
+        }
+
+
+def request_password_reset(email: str) -> dict[str, Any]:
+    email_clean = _normalize_email(email)
+
+    try:
+        client = _auth_client()
+        client.auth.reset_password_for_email(email_clean)
+        return {
+            "ok": True,
+            "message": "Se o e-mail informado estiver cadastrado, enviamos um código de recuperação para ele.",
+        }
+    except Exception as exc:
+        return {
+            "ok": False,
+            "message": _friendly_auth_error(exc),
+        }
+
+
+def confirm_password_reset_with_otp(email: str, otp: str, new_password: str) -> dict[str, Any]:
+    email_clean = _normalize_email(email)
+    otp_clean = otp.strip()
+
+    try:
+        client = _auth_client()
+        response = client.auth.verify_otp(
+            {
+                "email": email_clean,
+                "token": otp_clean,
+                "type": "recovery",
+            }
+        )
+        session = getattr(response, "session", None)
+
+        if session is None:
+            return {"ok": False, "message": "Código inválido ou expirado. Solicite um novo código."}
+
+        update_response = client.auth.update_user({"password": new_password})
+        user = getattr(update_response, "user", None)
+
+        if user is None:
+            return {"ok": False, "message": "Não foi possível atualizar sua senha."}
+
+        return {
+            "ok": True,
+            "message": "Senha atualizada com sucesso.",
+            "email": str(getattr(user, "email", "") or "").strip().lower(),
+        }
+    except Exception as exc:
+        return {
+            "ok": False,
             "message": _friendly_auth_error(exc),
         }
