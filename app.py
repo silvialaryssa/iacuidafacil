@@ -7,7 +7,7 @@ from services.analytics_service import get_analytics_service
 from services.app_service import record_session_once
 from ui.admin import render_admin
 from ui.auth import render_auth_section
-from ui.components import load_css
+from ui.components import load_css, render_top_nav
 from ui.calendar import render_calendar
 from ui.home import render_home
 from ui.landing import render_landing
@@ -64,48 +64,6 @@ def track_section_access_once(page_name: str, email: str = "") -> None:
         st.session_state["last_tracked_section_access"] = signature
 
 
-with st.sidebar:
-    st.title("🌿iACuidaFácil")
-    st.caption("Planta com IA, rotinas e acompanhamento.")
-    st.divider()
-
-    if "user" not in st.session_state:
-        st.caption("Use a tela principal, na aba 'Entrar', para acessar sua conta ou se cadastrar.")
-
-    else:
-        user = st.session_state["user"]
-        st.success(f"Logado como {user.get('nome', '')}")
-        st.caption(user.get("email", ""))
-
-        is_admin_sidebar = user.get("email", "").strip().lower() == admin_email()
-        page_options = ["🏠 Sua Rotina", "🗓️ Calendário", "📈 Evolução", "🌱 Planta com IA"]
-        if is_admin_sidebar:
-            page_options.insert(2, "🧪 Admin")
-
-        current_page = st.session_state.get("page", "🏠 Sua Rotina")
-        if current_page not in page_options:
-            current_page = "🏠 Sua Rotina"
-
-        st.session_state["page"] = st.radio(
-            "Navegação",
-            page_options,
-            index=page_options.index(current_page),
-        )
-
-        if st.button("Sair"):
-            for key in [
-                "user",
-                "session_recorded",
-                "login_message",
-                "page",
-                "auth_user_id",
-                "auth_access_token",
-                "auth_refresh_token",
-                "last_tracked_section_access",
-            ]:
-                st.session_state.pop(key, None)
-            st.rerun()
-
 st.title("🌿 iACuidaFácil")
 #st.caption("Cuide da planta com IA e acompanhe suas atividades do dia a dia.")
 
@@ -135,10 +93,26 @@ if "user" not in st.session_state:
 user = st.session_state["user"]
 record_session_once(user)
 
-st.info("⬅️ Use o menu lateral para navegar entre as seções (Sua Rotina, Calendário, Evolução, Planta com IA).")
-
-page = st.session_state.get("page", "🏠 Sua Rotina")
 is_admin = user.get("email", "").strip().lower() == admin_email()
+selected = render_top_nav(user, is_admin)
+
+if selected == "🚪 Sair":
+    for key in [
+        "user",
+        "session_recorded",
+        "login_message",
+        "page",
+        "nav_page",
+        "auth_user_id",
+        "auth_access_token",
+        "auth_refresh_token",
+        "last_tracked_section_access",
+    ]:
+        st.session_state.pop(key, None)
+    st.rerun()
+
+st.session_state["page"] = selected
+page = selected
 track_section_access_once(page, email=user.get("email", ""))
 
 if page == "🏠 Sua Rotina":
