@@ -22,6 +22,21 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+try:
+    st.markdown("""
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4F6F52">
+    <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js").catch(function(error) {
+        console.log("Service Worker não registrado:", error);
+      });
+    }
+    </script>
+    """, unsafe_allow_html=True)
+except Exception:
+    pass
+
 load_css()
 
 
