@@ -1,19 +1,23 @@
 from __future__ import annotations
 
 import streamlit as st
+import os
 
 
 def get_secret(name: str, default: str = "") -> str:
-    try:
-        value = st.secrets.get(name)
+    value = os.getenv(name)
 
-        if value is None:
-            return default
-
+    if value:
         return str(value).strip()
 
+    try:
+        value = st.secrets.get(name)
+        if value is not None:
+            return str(value).strip()
     except Exception:
-        return default
+        pass
+
+    return default
 
 def admin_email() -> str:
     return get_secret("admin_email", "admin@cuidafacil.com").strip().lower()
