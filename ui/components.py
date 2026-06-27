@@ -5,9 +5,9 @@ from streamlit_option_menu import option_menu
 
 PAGE_ICONS = {
     "🏠 Sua Rotina": "house",
-    "🗓️ Calendário": "calendar3",
-    "📈 Evolução": "graph-up",
     "🌱 Planta com IA": "flower1",
+    "🗓️ Calendário": "calendar3",
+    "📈 Evolução": "graph-up",  
     "🧪 Admin": "gear",
 }
 SAIR_OPTION = "🚪 Sair"
@@ -19,7 +19,7 @@ def load_css() -> None:
 
 
 def render_top_nav(user: dict, is_admin: bool) -> str:
-    page_options = ["🏠 Sua Rotina", "🗓️ Calendário", "📈 Evolução", "🌱 Planta com IA"]
+    page_options = ["🏠 Sua Rotina","🌱 Planta com IA", "🗓️ Calendário", "📈 Evolução"]
     if is_admin:
         page_options.insert(2, "🧪 Admin")
     page_options.append(SAIR_OPTION)

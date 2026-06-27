@@ -44,9 +44,9 @@ def track_section_access_once(page_name: str, email: str = "") -> None:
     analytics = get_analytics_service()
     methods_by_page = {
         "🏠 Sua Rotina": "track_hoje_access",
+        "🌱 Planta com IA": "track_planta_ia_access",
         "🗓️ Calendário": "track_calendario_access",
         "📈 Evolução": "track_evolucao_access",
-        "🌱 Planta com IA": "track_planta_ia_access",
         "🧪 Admin": "track_admin_access",
     }
 
